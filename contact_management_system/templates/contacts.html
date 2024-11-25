@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Contacts{% endblock %}
+
+{% block content %}
+<h1>Contacts</h1>
+
+<!-- Search Bar -->
+<div class="mb-4">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search contacts..." onkeyup="searchContacts()">
+</div>
+
+<!-- Add New Contact Button -->
+<a href="/add_contact" class="btn btn-primary mb-4">Add New Contact</a>
+
+<!-- Contacts Table -->
+<table class="table mt-4" id="contactsTable">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contact in contacts %}
+        <tr id="contactRow{{ contact[0] }}">
+            <td>{{ contact[0] }}</td>
+            <td>{{ contact[1] }}</td>
+            <td>{{ contact[2] }}</td>
+            <td>{{ contact[3] }}</td>
+            <td>
+                <a href="/edit_contact/{{ contact[0] }}" class="btn btn-warning btn-sm">Edit</a>
+
+                <!-- Form for Deleting Contact -->
+                <form method="POST" action="/delete_contact/{{ contact[0] }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirmDelete('{{ contact[1] }}');">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    // Function to search contacts dynamically as the user types
+    function searchContacts() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const contactRows = document.querySelectorAll('#contactsTable tbody tr');
+        
+        contactRows.forEach(row => {
+            const name = row.cells[0].textContent.toLowerCase();
+            const email = row.cells[1].textContent.toLowerCase();
+            const phone = row.cells[2].textContent.toLowerCase();
+            
+            // Check if the search query matches any field (name, email, or phone)
+            if (name.includes(searchInput) || email.includes(searchInput) || phone.includes(searchInput)) {
+                row.style.display = ''; // Show the row
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+    }
+
+    // Function to confirm delete action
+    function confirmDelete(contactName) {
+        return confirm(`Are you sure you want to delete the contact "${contactName}"?`);
+    }
+</script>
+
+{% endblock %}
